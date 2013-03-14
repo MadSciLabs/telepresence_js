@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<!--
+	//This needs to be commentd out for some reason
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+-->
+        <script type="text/javascript" src="js/sb.js"></script>
+
+    <script type="text/javascript">
+
+        function range(x, in_min, in_max, out_min, out_max)
+        {
+          return Math.floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
+        }
+
+    	// when page loads call spacebrew setup function 
+		$(window).on("load", setupSpacebrew);
+
+		// wher the jquery mobile is ready to initialize the UI call the setUI function 
+		$(document).bind("pageinit", setupUI);
+
+		// variable that holds the spacebrew client object
+		var sb;
+
+		// * setupSpacebrew Function that creates and configures the connection to the Spacebrew server.  It is called when the page loads.
+		function setupSpacebrew (){
+			console.log("Setting up spacebrew connection");
+			sb = new Spacebrew.Client(undefined, 
+								"Spacebrew Sliders",
+								"Sliders for sending and displaying SpaceBrew range messages."
+			);
+			sb.addPublish("camera_x", "range");
+			sb.addPublish("camera_y", "range");
+			sb.addPublish("button_1", "boolean");
+
+			sb.onRangeMessage = onRangeMessage;
+			sb.connect();
+		};
+
+		//**setupUI Function that create the event listeners for the sliders. It creates an callback function that sends a spacebrew message whenever an slide event is received.
+		function setupUI() {
+			console.log("Setting up the UI listeners");
+
+			// when the slider state changes it sends a message to spacebrew
+			$(".slider").bind( "change", function(event, ui) {
+				sb.send(event.target.id, "range", event.target.valueAsNumber);
+			});
+		}
+
+		// * onRangeMessage Function that is called whenever new spacebrew range messages are received.  
+		// *	It accepts two parameters:
+		// * @param  {String} name  	Holds name of the subscription feed channel
+		// * @param  {Integer} value 	Holds value received from the subscription feed
+		// *
+		function onRangeMessage(name, value){
+			console.log("Received new range message ", value);
+			$("#"+name).slider('refresh', value);
+		};
+
+    </script>
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.3.0-beta2.js"></script>
+    <script>
+
+      function writeMessage(messageLayer, message) {
+        var context = messageLayer.getContext();
+        messageLayer.clear();
+        context.font = '18pt Calibri';
+        context.fillStyle = 'black';
+        context.fillText(message, 10, 25);
+      }
+      var stage = new Kinetic.Stage({
+        container: 'container',
+        width: 800,
+        height: 600
+      });
+
+      var shapesLayer = new Kinetic.Layer();
+      var messageLayer = new Kinetic.Layer();
+
+      var joy_loc_x = 200;
+      var joy_loc_y = 200;
+      var joy_radius = 150;
+      var joy_small_radius = 50;
+      var joy_on = false;
+
+      var joy_frame_x = joy_loc_x - joy_radius - joy_small_radius;
+      var joy_frame_y = joy_loc_y - joy_radius - joy_small_radius;
+      var joy_frame_w = 2*joy_radius + 2*joy_small_radius;
+      var joy_frame_h = 2*joy_radius + 2*joy_small_radius;
+
+      var joy_range_x1 = joy_loc_x - joy_radius;
+      var joy_range_x2 = joy_loc_x + joy_radius;
+      var joy_range_y1 = joy_loc_y - joy_radius;
+      var joy_range_y2 = joy_loc_y + joy_radius;
+
+      var button1 = new Kinetic.Circle({
+        x: .5 * stage.getWidth(),
+        y: .5 * stage.getHeight(),
+        radius: 50,
+        fill: 'red',
+        stroke: 'black',
+        strokeWidth: 4
+      });
+
+      var joy_xline = new Kinetic.Line({
+        points: [joy_loc_x-joy_radius,joy_loc_y,joy_loc_x+joy_radius,joy_loc_y],
+        stroke: 'black',
+        strokeWidth: 1,
+        lineCap: 'round',
+        lineJoin: 'round'
+      });
+
+      var joy_yline = new Kinetic.Line({
+        points: [joy_loc_x,joy_loc_y-joy_radius,joy_loc_x,joy_loc_y+joy_radius],
+        stroke: 'black',
+        strokeWidth: 1,
+        lineCap: 'round',
+        lineJoin: 'round'
+      });
+
+      var joy_frame = new Kinetic.Rect({
+        x: joy_frame_x,
+        y: joy_frame_y,
+        width: joy_frame_w,
+        height: joy_frame_h,
+        stroke: 'black',
+        strokeWidth: 1
+      });
+
+      var joy_outside = new Kinetic.Circle({
+        x: joy_loc_x,
+        y: joy_loc_y,
+        radius: joy_radius,
+        fill: '#aaaaaa',
+        stroke: 'black',
+        strokeWidth: 2,
+      });
+
+      var joy_inside = new Kinetic.Circle({
+        draggable: true,
+        x: joy_loc_x,
+        y: joy_loc_y,
+        radius: joy_small_radius,
+        fill: '#002366',
+        stroke: '#002366',
+        strokeWidth: 0,
+        opacity: 0.75,
+
+        dragBoundFunc: function(pos) {
+
+            var x = joy_loc_x;
+            var y = joy_loc_y;
+            var radius = joy_radius;
+            var scale = radius / Math.sqrt(Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2));
+
+            if(scale < 1)
+              return {
+                y: Math.round((pos.y - y) * scale + y),
+                x: Math.round((pos.x - x) * scale + x)
+              };
+            else
+              return pos;
+        }
+
+      });
+
+      joy_frame.on('mousemove', function() {
+
+        if (joy_on) {
+          var p = joy_inside.getPosition();
+          var x = range(p.x,joy_range_x1,joy_range_x2,0,1023);
+          var y = range(p.y,joy_range_y1,joy_range_y2,0,1023);
+
+          writeMessage(messageLayer, x + "," + y);
+          sb.send("camera_x", "range", x);
+          sb.send("camera_y", "range", y);
+        }
+      });
+
+      joy_inside.on('dragstart', function() {
+        joy_on = true;
+      });
+
+      joy_inside.on('dragend', function() {
+        joy_on = false;
+      });
+
+      joy_inside.setDraggable(true);
+
+      shapesLayer.add(joy_outside);
+      shapesLayer.add(joy_xline);
+      shapesLayer.add(joy_yline);
+      shapesLayer.add(joy_frame);
+      shapesLayer.add(joy_inside);
+
+      stage.add(shapesLayer);
+      stage.add(messageLayer);
+
+    </script>
+  </body>
+</html>
