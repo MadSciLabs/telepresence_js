@@ -30,12 +30,14 @@
 		function setupSpacebrew (){
 			console.log("Setting up spacebrew connection");
 			sb = new Spacebrew.Client(undefined, 
-								"Spacebrew Sliders",
-								"Sliders for sending and displaying SpaceBrew range messages."
+                 		"Spacebrew Sliders",
+				"Sliders for sending and displaying SpaceBrew range messages."
 			);
 			sb.addPublish("camera_x", "range");
 			sb.addPublish("camera_y", "range");
 			sb.addPublish("button_1", "boolean");
+
+			sb.addPublish("slider_y", "range");
 
 			sb.onRangeMessage = onRangeMessage;
 			sb.connect();
@@ -75,12 +77,12 @@
     <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.3.0-beta2.js"></script>
     <script>
 
-      function writeMessage(messageLayer, message) {
+      function writeMessage(messageLayer, message, _x, _y) {
         var context = messageLayer.getContext();
         messageLayer.clear();
-        context.font = '18pt Calibri';
+        context.font = '16pt Calibri';
         context.fillStyle = 'black';
-        context.fillText(message, 10, 25);
+        context.fillText(message, _x, _y);
       }
       var stage = new Kinetic.Stage({
         container: 'container',
@@ -91,22 +93,89 @@
       var shapesLayer = new Kinetic.Layer();
       var messageLayer = new Kinetic.Layer();
 
-      var joy_loc_x = 200;
-      var joy_loc_y = 200;
-      var joy_radius = 150;
-      var joy_small_radius = 50;
-      var joy_on = false;
+      var unit_size = 150;
+      var slider_size = 150/2;
+      var slider_on = false;
 
-      var joy_frame_x = joy_loc_x - joy_radius - joy_small_radius;
-      var joy_frame_y = joy_loc_y - joy_radius - joy_small_radius;
-      var joy_frame_w = 2*joy_radius + 2*joy_small_radius;
-      var joy_frame_h = 2*joy_radius + 2*joy_small_radius;
+      var button_on = false;
 
-      var joy_range_x1 = joy_loc_x - joy_radius;
-      var joy_range_x2 = joy_loc_x + joy_radius;
-      var joy_range_y1 = joy_loc_y - joy_radius;
-      var joy_range_y2 = joy_loc_y + joy_radius;
+      var button_frame = new Kinetic.Rect({
+        y: 2*unit_size,
+        x: 0,
+        width: 2*unit_size,
+        height: 2*unit_size,
+        stroke: 'black',
+        strokeWidth: 1
+      });
 
+      var button_circle = new Kinetic.Circle({
+        y: 3*unit_size,
+        x: unit_size,
+        radius: unit_size * .75,
+        fill: 'red',
+        stroke: 'black',
+        strokeWidth: 2,
+        opacity: .7
+      });
+
+      button_circle.on('mousedown', function() {
+
+        button_on = !button_on;
+
+        var _color = button_on ? 'green' : 'red';
+        this.setFill(_color);
+        shapesLayer.draw();
+        sb.send("button", "boolean", true);
+      });
+
+      button_circle.on('mouseover', function() {
+        this.setOpacity(1);
+        shapesLayer.draw();
+      });
+
+      button_circle.on('mouseout', function() {
+        this.setOpacity(.7);
+        shapesLayer.draw();
+      });
+
+      var slider_frame = new Kinetic.Rect({
+        x: 2*unit_size,
+        y: 0,
+        width: slider_size,
+        height: 2*unit_size,
+        stroke: 'black',
+        strokeWidth: 1
+      });
+
+      var slider_xline = new Kinetic.Line({
+        points: [unit_size*2, unit_size, unit_size*2 + slider_size, unit_size],
+        stroke: 'black',
+        strokeWidth: 20,
+        lineCap: 'round',
+        lineJoin: 'round',
+	draggable: true,
+        opacity: .75,
+        dragBoundFunc: function(pos) {
+
+	  var y = pos.y > unit_size ? unit_size : pos.y;
+	  y = y < -unit_size ? -unit_size : y;
+          return {
+            y: y,
+            x: 0
+          };
+        }
+      });
+
+      slider_frame.on('mousemove', function() {
+
+        var p = slider_xline.getPosition();
+        var _y = range(p.y,-unit_size,unit_size,0,1023);
+
+        writeMessage(messageLayer, ","+_y, 2*unit_size, 20);
+        sb.send("slider_y", "range", _y);
+      });
+
+/*
       var button1 = new Kinetic.Circle({
         x: .5 * stage.getWidth(),
         y: .5 * stage.getHeight(),
@@ -115,6 +184,23 @@
         stroke: 'black',
         strokeWidth: 4
       });
+*/
+
+      var joy_loc_x = unit_size;
+      var joy_loc_y = unit_size;
+      var joy_radius = unit_size;
+      var joy_small_radius = 50;
+      var joy_on = false;
+
+      var joy_frame_x = joy_loc_x - joy_radius;
+      var joy_frame_y = joy_loc_y - joy_radius;
+      var joy_frame_w = 2*joy_radius;
+      var joy_frame_h = 2*joy_radius;
+
+      var joy_range_x1 = joy_loc_x - joy_radius;
+      var joy_range_x2 = joy_loc_x + joy_radius;
+      var joy_range_y1 = joy_loc_y - joy_radius;
+      var joy_range_y2 = joy_loc_y + joy_radius;
 
       var joy_xline = new Kinetic.Line({
         points: [joy_loc_x-joy_radius,joy_loc_y,joy_loc_x+joy_radius,joy_loc_y],
@@ -155,10 +241,10 @@
         x: joy_loc_x,
         y: joy_loc_y,
         radius: joy_small_radius,
-        fill: '#002366',
-        stroke: '#002366',
+        fill: 'blue',
+        stroke: 'blue',
         strokeWidth: 0,
-        opacity: 0.75,
+        opacity: 0.7,
 
         dragBoundFunc: function(pos) {
 
@@ -175,9 +261,9 @@
             else
               return pos;
         }
-
       });
 
+      
       joy_frame.on('mousemove', function() {
 
         if (joy_on) {
@@ -185,27 +271,38 @@
           var x = range(p.x,joy_range_x1,joy_range_x2,0,1023);
           var y = range(p.y,joy_range_y1,joy_range_y2,0,1023);
 
-          writeMessage(messageLayer, x + "," + y);
+          writeMessage(messageLayer, x + "," + y, joy_loc_x-unit_size, joy_loc_y-unit_size+20);
           sb.send("camera_x", "range", x);
           sb.send("camera_y", "range", y);
         }
+
       });
 
       joy_inside.on('dragstart', function() {
         joy_on = true;
+        this.setOpacity(.7);
+        shapesLayer.draw();
       });
 
       joy_inside.on('dragend', function() {
         joy_on = false;
+        this.setOpacity(.5);
+        shapesLayer.draw();
       });
 
-      joy_inside.setDraggable(true);
+      //joy_inside.setDraggable(true);
 
       shapesLayer.add(joy_outside);
       shapesLayer.add(joy_xline);
       shapesLayer.add(joy_yline);
       shapesLayer.add(joy_frame);
       shapesLayer.add(joy_inside);
+
+      shapesLayer.add(slider_frame);
+      shapesLayer.add(slider_xline);
+
+      shapesLayer.add(button_frame);
+      shapesLayer.add(button_circle);
 
       stage.add(shapesLayer);
       stage.add(messageLayer);
