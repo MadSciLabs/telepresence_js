@@ -9,6 +9,11 @@
 	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
 -->
         <script type="text/javascript" src="js/sb.js"></script>
+        <script type="text/javascript" src="js/tele.button.js"></script>
+        <script type="text/javascript" src="js/tele.slider.js"></script>
+        <script type="text/javascript" src="js/tele.joystick.js"></script>
+    
+        <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.3.0-beta2.js"></script>
 
     <script type="text/javascript">
 
@@ -18,13 +23,13 @@
         }
 
     	// when page loads call spacebrew setup function 
-		$(window).on("load", setupSpacebrew);
+		//$(window).on("load", setupSpacebrew);
 
 		// wher the jquery mobile is ready to initialize the UI call the setUI function 
 		$(document).bind("pageinit", setupUI);
 
 		// variable that holds the spacebrew client object
-		var sb;
+		//var sb;
 
 		// * setupSpacebrew Function that creates and configures the connection to the Spacebrew server.  It is called when the page loads.
 		function setupSpacebrew (){
@@ -37,30 +42,10 @@
 			sb.addPublish("camera_y", "range");
 			sb.addPublish("button_1", "boolean");
 
-			sb.addPublish("slider_y", "range");
+			//sb.addPublish("slider_y", "range");
 
-			sb.onRangeMessage = onRangeMessage;
+			//sb.onRangeMessage = onRangeMessage;
 			sb.connect();
-		};
-
-		//**setupUI Function that create the event listeners for the sliders. It creates an callback function that sends a spacebrew message whenever an slide event is received.
-		function setupUI() {
-			console.log("Setting up the UI listeners");
-
-			// when the slider state changes it sends a message to spacebrew
-			$(".slider").bind( "change", function(event, ui) {
-				sb.send(event.target.id, "range", event.target.valueAsNumber);
-			});
-		}
-
-		// * onRangeMessage Function that is called whenever new spacebrew range messages are received.  
-		// *	It accepts two parameters:
-		// * @param  {String} name  	Holds name of the subscription feed channel
-		// * @param  {Integer} value 	Holds value received from the subscription feed
-		// *
-		function onRangeMessage(name, value){
-			console.log("Received new range message ", value);
-			$("#"+name).slider('refresh', value);
 		};
 
     </script>
@@ -74,8 +59,12 @@
   </head>
   <body>
     <div id="container"></div>
-    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.3.0-beta2.js"></script>
     <script>
+
+      //SpaceBrew
+      var sb;
+
+      setupSpacebrew();
 
       function writeMessage(messageLayer, message, _x, _y) {
         var context = messageLayer.getContext();
@@ -84,6 +73,7 @@
         context.fillStyle = 'black';
         context.fillText(message, _x, _y);
       }
+
       var stage = new Kinetic.Stage({
         container: 'container',
         width: 800,
@@ -93,99 +83,13 @@
       var shapesLayer = new Kinetic.Layer();
       var messageLayer = new Kinetic.Layer();
 
+      var button_1 = new obj_button(450,450,60,0);
+      var slider_1 = new obj_slider(50,50,50,0);
+      var joy_1 = new obj_joystick(250,250,100,0);
+
       var unit_size = 150;
-      var slider_size = 150/2;
-      var slider_on = false;
-
-      var button_on = false;
-
-      var button_frame = new Kinetic.Rect({
-        y: 2*unit_size,
-        x: 0,
-        width: 2*unit_size,
-        height: 2*unit_size,
-        stroke: 'black',
-        strokeWidth: 1
-      });
-
-      var button_circle = new Kinetic.Circle({
-        y: 3*unit_size,
-        x: unit_size,
-        radius: unit_size * .75,
-        fill: 'red',
-        stroke: 'black',
-        strokeWidth: 2,
-        opacity: .7
-      });
-
-      button_circle.on('mousedown', function() {
-
-        button_on = !button_on;
-
-        var _color = button_on ? 'green' : 'red';
-        this.setFill(_color);
-        shapesLayer.draw();
-        sb.send("button", "boolean", true);
-      });
-
-      button_circle.on('mouseover', function() {
-        this.setOpacity(1);
-        shapesLayer.draw();
-      });
-
-      button_circle.on('mouseout', function() {
-        this.setOpacity(.7);
-        shapesLayer.draw();
-      });
-
-      var slider_frame = new Kinetic.Rect({
-        x: 2*unit_size,
-        y: 0,
-        width: slider_size,
-        height: 2*unit_size,
-        stroke: 'black',
-        strokeWidth: 1
-      });
-
-      var slider_xline = new Kinetic.Line({
-        points: [unit_size*2, unit_size, unit_size*2 + slider_size, unit_size],
-        stroke: 'black',
-        strokeWidth: 20,
-        lineCap: 'round',
-        lineJoin: 'round',
-	draggable: true,
-        opacity: .75,
-        dragBoundFunc: function(pos) {
-
-	  var y = pos.y > unit_size ? unit_size : pos.y;
-	  y = y < -unit_size ? -unit_size : y;
-          return {
-            y: y,
-            x: 0
-          };
-        }
-      });
-
-      slider_frame.on('mousemove', function() {
-
-        var p = slider_xline.getPosition();
-        var _y = range(p.y,-unit_size,unit_size,0,1023);
-
-        writeMessage(messageLayer, ","+_y, 2*unit_size, 20);
-        sb.send("slider_y", "range", _y);
-      });
 
 /*
-      var button1 = new Kinetic.Circle({
-        x: .5 * stage.getWidth(),
-        y: .5 * stage.getHeight(),
-        radius: 50,
-        fill: 'red',
-        stroke: 'black',
-        strokeWidth: 4
-      });
-*/
-
       var joy_loc_x = unit_size;
       var joy_loc_y = unit_size;
       var joy_radius = unit_size;
@@ -244,7 +148,7 @@
         fill: 'blue',
         stroke: 'blue',
         strokeWidth: 0,
-        opacity: 0.7,
+        opacity: 0.5,
 
         dragBoundFunc: function(pos) {
 
@@ -262,7 +166,6 @@
               return pos;
         }
       });
-
       
       joy_frame.on('mousemove', function() {
 
@@ -280,7 +183,7 @@
 
       joy_inside.on('dragstart', function() {
         joy_on = true;
-        this.setOpacity(.7);
+        this.setOpacity(.5);
         shapesLayer.draw();
       });
 
@@ -289,20 +192,31 @@
         this.setOpacity(.5);
         shapesLayer.draw();
       });
+*/
 
       //joy_inside.setDraggable(true);
 
+/*
       shapesLayer.add(joy_outside);
       shapesLayer.add(joy_xline);
       shapesLayer.add(joy_yline);
       shapesLayer.add(joy_frame);
       shapesLayer.add(joy_inside);
+*/
 
+/*
       shapesLayer.add(slider_frame);
       shapesLayer.add(slider_xline);
-
       shapesLayer.add(button_frame);
       shapesLayer.add(button_circle);
+*/
+
+//      shapesLayer.add(obj_button_1.frame);
+//      shapesLayer.add(obj_button_1.circle);
+      
+      button_1.init();
+      slider_1.init();
+      joy_1.init();
 
       stage.add(shapesLayer);
       stage.add(messageLayer);
