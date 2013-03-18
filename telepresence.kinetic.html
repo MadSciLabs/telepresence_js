@@ -18,6 +18,35 @@
 
     <script type="text/javascript">
 
+      /**
+       * onBooleanMessage Function that is called whenever new spacebrew boolean messages are received.
+       *          It accepts two parameters:
+       * @param  {String} name    Holds name of the subscription feed channel
+       * @param  {Integer} value  Holds boolean received from the subscription feed
+       */
+      function onBooleanMessage( name, value ){
+
+        console.log("bool : " + name + "," + value);
+        led_0.setLed(value);
+        
+        // handle the messages from each subscription channel
+        if (name == "bool1") {
+            console.log("received bool1 message");
+            boolVal1 = value;   // set boolean value 1
+        }
+
+         if (name == "bool2") {
+            console.log("received bool2 message");
+            boolVal2 = value;   // set boolean value 2
+        }
+
+         if (name == "bool1") {
+            console.log("received bool1 message");
+            boolVal3 = value;   // set boolean value 3
+        }
+
+      }
+
         function range(x, in_min, in_max, out_min, out_max)
         {
           return Math.floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
@@ -40,13 +69,10 @@
 				"Sliders for sending and displaying SpaceBrew range messages."
 			);
 
-			//sb.addPublish("camera_x", "range");
-			//sb.addPublish("camera_y", "range");
-			//sb.addPublish("button_1", "boolean");
+                        //sb.onRangeMessage = onRangeMessage;
+                        //sb.onStringMessage = onStringMessage;
+                        sb.onBooleanMessage = onBooleanMessage;
 
-			//sb.addPublish("slider_y", "range");
-
-			//sb.onRangeMessage = onRangeMessage;
 			sb.connect();
 		};
 
@@ -65,6 +91,7 @@
 
       //SpaceBrew
       var sb;
+      var unit_size = 150;
 
       setupSpacebrew();
 
@@ -83,25 +110,18 @@
       });
 
       var shapesLayer = new Kinetic.Layer();
-      var messageLayer = new Kinetic.Layer();
 
       var joy_1 = new obj_joystick(50,50,300,0);
-      var button_0 = new obj_button(350,50,150,0);
-      var button_1 = new obj_button(350,200,150,1);
-      var slider_0 = new obj_slider(500,50,300,0);
-      var led_0 = new obj_slider(50,350,100,0);
-
-      var unit_size = 150;
-
-      //joy_inside.setDraggable(true);
+      var button_0 = new obj_button(375,50,150,0);
+      var button_1 = new obj_button(525,200,150,1);
+      var slider_0 = new obj_slider(700,50,300,0);
+      var led_0 = new obj_led(50,375,75,0);
 
       joy_1.init();
-/*
       button_0.init();
       button_1.init();
       slider_0.init();
       led_0.init();
-*/
 
       stage.add(shapesLayer);
 

@@ -1,1 +1,1 @@
-../../spacebrew.js/library/sb-1.0.3.min.js
+../../library/sb.js

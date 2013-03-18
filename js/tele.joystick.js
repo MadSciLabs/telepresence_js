@@ -19,13 +19,14 @@
 
      this.on = false;
 
-     this.range_x1 = this.x;
-     this.range_x2 = this.x + this.size;
+     this.range_x1 = this.x + this.small_radius;
+     this.range_x2 = this.x + this.size - this.small_radius;
 
-     this.range_y1 = this.y;
-     this.range_y2 = this.y + this.size;
+     this.range_y1 = this.y + this.small_radius;
+     this.range_y2 = this.y + this.size - this.small_radius;
 
      this.msgLayer = new Kinetic.Layer();
+     this.nameLayer = new Kinetic.Layer();
 
      this.frame = new Kinetic.Rect({
        y: this.y,
@@ -58,11 +59,9 @@
 
        dragBoundFunc: function(pos) {
 
-         _radius = _this.radius;
-         _x = _this.x + _radius;
-         _y = _this.y + _radius;
-
-console.log (_this.small_radius + "," + _this.x + "," + _x + "," + _radius);
+         _radius = _this.radius - _this.small_radius;
+         _x = _this.x + _radius + _this.small_radius;
+         _y = _this.y + _radius + _this.small_radius;
 
          var scale = _radius / Math.sqrt(Math.pow(pos.x - _x, 2) + Math.pow(pos.y - _y, 2));
 
@@ -98,14 +97,22 @@ console.log (_this.small_radius + "," + _this.x + "," + _x + "," + _radius);
         if (_this.on) {
           p = _this.inside.getPosition();
 
+/*
+          _this.yline.getPoints()[0].x = p.x 
+          _this.yline.getPoints()[1].x = p.x
+ 
+          _this.xline.getPoints()[0].y = p.y 
+          _this.xline.getPoints()[1].y = p.y
+          shapesLayer.draw();
+*/
+
           var x = range(p.x,_this.range_x1,_this.range_x2,0,1023);
-          var y = range(p.y,_this.range_y1,_this.range_y2,350,1023);
+          var y = range(p.y,_this.range_y1,_this.range_y2,0,1023);
 
-          writeMessage(_this.msgLayer, x + ", " + y, _this.x+5, _this.y+15);
+          writeMessage(_this.msgLayer, x + ", " + y, _this.x+5, _this.y+20);
 
-          //writeMessage(messageLayer, _this.name_x + ": " + x + " " + _this.name_y + ": " + y, _this.x+5, _this.y+15);
-          sb.send("camera_x", "range", x);
-          sb.send("camera_y", "range", y);
+          sb.send(_this.name_x, "range", x);
+          sb.send(_this.name_y, "range", y);
 
         }
     });
@@ -137,7 +144,10 @@ console.log (_this.small_radius + "," + _this.x + "," + _x + "," + _radius);
       shapesLayer.add(this.xline);
       shapesLayer.add(this.yline);
 
-      stage.add(_this.msgLayer);
+      stage.add(this.msgLayer);
+      stage.add(this.nameLayer);
+
+      writeMessage(this.nameLayer, this.name_x+", "+this.name_y, this.x, _this.y+this.size+20);
 
       sb.addPublish(this.name_x, "range");
       sb.addPublish(this.name_y, "range");

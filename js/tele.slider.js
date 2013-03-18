@@ -8,6 +8,12 @@
      this.size = _size;
      this.x = _x;
      this.y = _y;
+     this.on = false;
+
+     this.msgLayer = new Kinetic.Layer();
+     this.nameLayer = new Kinetic.Layer();
+
+     var _this = this;
 
      this.frame = new Kinetic.Rect({
         x: _x,
@@ -38,17 +44,29 @@
         }
      });
 
-     this.xline.on('mousemove', function() {
+     this.frame.on('mousemove', function() {
 
-        var p = this.getPosition();
-        var _ty = range(p.y,this.y,this.y+this.size,0,1023);
+        if (_this.on) {
 
-        writeMessage(messageLayer, ","+_ty, this.size, 20);
+        var p = _this.xline.getPosition();
+console.log(p);
+        var _ty = range(p.y,0,_this.size,1023,0);
+
+        writeMessage(_this.msgLayer, _ty, _this.x+5, _this.y+20);
         sb.send(this.name, "range", _ty);
+        }
      });
 
+    this.xline.on('dragstart', function() {
+      _this.on = true;
+    });
+
+    this.xline.on('dragend', function() {
+      _this.on = false;
+    });
+
     this.xline.on('mouseover', function() {
-        this.setOpacity(1);
+        this.setOpacity(.7);
         shapesLayer.draw();
     });
 
@@ -62,6 +80,11 @@
      {
        shapesLayer.add(this.frame);
        shapesLayer.add(this.xline);
+
+       stage.add(_this.msgLayer);
+       stage.add(this.nameLayer);
+
+       writeMessage(this.nameLayer, this.name, this.x, _this.y+this.size+20);
 
        sb.addPublish(this.name, "boolean");
      };

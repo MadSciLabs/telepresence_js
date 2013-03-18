@@ -1,9 +1,9 @@
   var BORDER_SIZE = 2;
-  var OPACITY = .5;
+  var OPACITY = .7;
 
   function obj_button(_x, _y, _size, _index)
   {
-     _this = this;
+     var _this = this;
 
      this.x = _x;
      this.y = _y;
@@ -12,13 +12,16 @@
      this.name = "button_" + _index;
      this.on = false;
 
+     this.nameLayer = new Kinetic.Layer();
+
      this.frame = new Kinetic.Rect({
        y: this.y,
        x: this.x,
        width: this.size,
        height: this.size,
        stroke: 'black',
-       strokeWidth: 1
+       strokeWidth: 1,
+       opacity: 1
     });
 
     this.circle = new Kinetic.Circle({
@@ -38,7 +41,8 @@
         this.setFill(_color);
 
         shapesLayer.draw();
-        sb.send(this.name, "boolean", _this.on);
+
+        sb.send(_this.name, "boolean", _this.on.toString());
     });
 
     this.circle.on('mouseover', function() {
@@ -47,7 +51,7 @@
     });
 
     this.circle.on('mouseout', function() {
-        this.setOpacity(.5);
+        this.setOpacity(OPACITY);
         shapesLayer.draw();
     });
 
@@ -57,9 +61,11 @@
       shapesLayer.add(this.frame);
       shapesLayer.add(this.circle);
 
+      stage.add(this.nameLayer);
+      writeMessage(this.nameLayer, this.name, this.x, this.y+this.size+20);
+
       sb.addPublish(this.name, "boolean");
     };
-
 }
 
 
