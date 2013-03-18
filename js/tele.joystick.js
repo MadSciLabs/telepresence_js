@@ -3,16 +3,29 @@
 
   function obj_joystick(_x, _y, _size, _index)
   {
+     //So this i can use 'this' reference within another context
+     _this = this;
+
      this.x = _x;
      this.y = _y;
+
      this.size = _size;
+
      this.name_x = "joy_" + _index + "_x";
      this.name_y = "joy_" + _index + "_y";
 
      this.radius = _size * .5;
-     this.small_radius = _size * .25;
+     this.small_radius = _size * .125;
 
      this.on = false;
+
+     this.range_x1 = this.x;
+     this.range_x2 = this.x + this.size;
+
+     this.range_y1 = this.y;
+     this.range_y2 = this.y + this.size;
+
+     this.msgLayer = new Kinetic.Layer();
 
      this.frame = new Kinetic.Rect({
        y: this.y,
@@ -45,9 +58,10 @@
 
        dragBoundFunc: function(pos) {
 
-         var _x = this.x;
-         var _y = this.y;
-         var _radius = 50; //this.radius;
+         _radius = .5 * _this.size;
+         _x = _this.x + _radius;
+         _y = _this.y + _radius;
+
          var scale = _radius / Math.sqrt(Math.pow(pos.x - _x, 2) + Math.pow(pos.y - _y, 2));
 
          if(scale < 1)
@@ -77,37 +91,29 @@
         lineJoin: 'round'
     });
 
-    this.circle.on('mousedown', function() {
+    this.circle.on('mousemove', function() {
+        if (_this.on) {
 
-        this.on = !this.on;
-        var _color = this.on ? 'green' : 'red';
-        this.setFill(_color);
+          p = _this.inside.getPosition();
 
-        shapesLayer.draw();
-        sb.send(this.name, "boolean", this.on);
-    });
+          var x = range(p.x,_this.range_x1,_this.range_x2,0,1023);
+          var y = range(p.y,_this.range_y1,_this.range_y2,350,1023);
 
-    this.frame.on('mousemove', function() {
+          writeMessage(_this.msgLayer, x + ", " + y, _this.x+5, _this.y+15);
 
-        if (this.on) {
-/*
-          var p = this.inside.getPosition();
-          var x = range(p.x,joy_range_x1,joy_range_x2,0,1023);
-          var y = range(p.y,joy_range_y1,joy_range_y2,0,1023);
-
-          //writeMessage(messageLayer, x + "," + y, joy_loc_x-unit_size, joy_loc_y-unit_size+20);
+          //writeMessage(messageLayer, _this.name_x + ": " + x + " " + _this.name_y + ": " + y, _this.x+5, _this.y+15);
           sb.send("camera_x", "range", x);
           sb.send("camera_y", "range", y);
-*/
+
         }
     });
 
     this.inside.on('dragstart', function() {
-      this.on = true;
+      _this.on = true;
     });
 
     this.inside.on('dragend', function() {
-      this.on = false;
+      _this.on = false;
     });
 
     this.inside.on('mouseover', function() {
@@ -129,10 +135,11 @@
       shapesLayer.add(this.xline);
       shapesLayer.add(this.yline);
 
+      //stage.add(_this.msgLayer);
+
       sb.addPublish(this.name_x, "range");
       sb.addPublish(this.name_y, "range");
     };
-
 }
 
 

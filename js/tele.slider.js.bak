@@ -3,6 +3,7 @@
 
   function obj_slider(_x, _y, _size, _index)
   {
+     _this = this;
      this.vertical = true;
      this.name = "slider_" + _index;
      this.size = _size;
@@ -19,9 +20,9 @@
      });
 
      this.xline = new Kinetic.Line({
-        points: [_x, _y, _x+(.25*_size), _y],
+        points: [_x, _y, _x+_size*.25, _y],
         stroke: 'black',
-        strokeWidth: 30,
+        strokeWidth: 20,
         lineCap: 'butt',
         lineJoin: 'round',
         draggable: true,
@@ -29,7 +30,7 @@
         dragBoundFunc: function(pos) {
 
           var y = pos.y > _size ? _size : pos.y;
-          y = y < 0 ? 0 : y;
+          //y = y < 0 ? 0 : y;
 
           return {
             y: y,
@@ -47,16 +48,6 @@
         sb.send(this.name, "range", _ty);
      });
 
-    this.xline.on('mouseover', function() {
-        this.setOpacity(1);
-        shapesLayer.draw();
-    });
-
-    this.xline.on('mouseout', function() {
-        this.setOpacity(.5);
-        shapesLayer.draw();
-    });
-
      //Init and add to SpaceBrew
      this.init = function()
      {
@@ -66,5 +57,4 @@
        sb.addPublish(this.name, "boolean");
      };
 }
-
 
