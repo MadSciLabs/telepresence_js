@@ -4,7 +4,7 @@
   function obj_joystick(_x, _y, _size, _index)
   {
      //So this i can use 'this' reference within another context
-     _this = this;
+     var _this = this;
 
      this.x = _x;
      this.y = _y;
@@ -58,9 +58,11 @@
 
        dragBoundFunc: function(pos) {
 
-         _radius = .5 * _this.size;
+         _radius = _this.radius;
          _x = _this.x + _radius;
          _y = _this.y + _radius;
+
+console.log (_this.small_radius + "," + _this.x + "," + _x + "," + _radius);
 
          var scale = _radius / Math.sqrt(Math.pow(pos.x - _x, 2) + Math.pow(pos.y - _y, 2));
 
@@ -92,8 +94,8 @@
     });
 
     this.circle.on('mousemove', function() {
-        if (_this.on) {
 
+        if (_this.on) {
           p = _this.inside.getPosition();
 
           var x = range(p.x,_this.range_x1,_this.range_x2,0,1023);
@@ -135,7 +137,7 @@
       shapesLayer.add(this.xline);
       shapesLayer.add(this.yline);
 
-      //stage.add(_this.msgLayer);
+      stage.add(_this.msgLayer);
 
       sb.addPublish(this.name_x, "range");
       sb.addPublish(this.name_y, "range");
