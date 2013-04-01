@@ -59,9 +59,12 @@
 
        dragBoundFunc: function(pos) {
 
+         groupP = _this.group.getPosition();
+         console.log(groupP.x + "," + groupP.y);
+
          _radius = _this.radius - _this.small_radius;
-         _x = _this.x + _radius + _this.small_radius;
-         _y = _this.y + _radius + _this.small_radius;
+         _x = _this.x + _radius + _this.small_radius + groupP.x;
+         _y = _this.y + _radius + _this.small_radius + groupP.y;
 
          var scale = _radius / Math.sqrt(Math.pow(pos.x - _x, 2) + Math.pow(pos.y - _y, 2));
 
@@ -92,22 +95,24 @@
         lineJoin: 'round'
     });
 
+    this.group = new Kinetic.Group({
+        draggable: true
+    });
+
+    this.group.add(this.frame);
+    this.group.add(this.circle);
+    this.group.add(this.inside);
+    this.group.add(this.xline);
+    this.group.add(this.yline);
+
     this.circle.on('mousemove', function() {
 
         if (_this.on) {
+
           p = _this.inside.getPosition();
 
-/*
-          _this.yline.getPoints()[0].x = p.x 
-          _this.yline.getPoints()[1].x = p.x
- 
-          _this.xline.getPoints()[0].y = p.y 
-          _this.xline.getPoints()[1].y = p.y
-          shapesLayer.draw();
-*/
-
-          var x = range(p.x,_this.range_x1,_this.range_x2,0,1023);
-          var y = range(p.y,_this.range_y1,_this.range_y2,0,1023);
+          var x = range(p.x+groupP.x,_this.range_x1,_this.range_x2,0,1023);
+          var y = range(p.y+groupP.y,_this.range_y1,_this.range_y2,0,1023);
 
           writeMessage(_this.msgLayer, x + ", " + y, _this.x+5, _this.y+20);
 
@@ -135,14 +140,25 @@
       shapesLayer.draw();
     });
 
+    this.group.on('dragend', function() {
+      var mousePos = stage.getMousePosition();
+
+      p = _this.group.getPosition();
+      //console.log("write frame : " + p.x + "," + p.y);
+      writeMessage(_this.nameLayer, _this.name_x+", "+_this.name_y, _this.x + p.x, _this.y + p.y + _this.size + 20);
+    });
+
     //Init and add to SpaceBrew
     this.init = function()
     {
+/*
       shapesLayer.add(this.frame);
       shapesLayer.add(this.circle);
       shapesLayer.add(this.inside);
       shapesLayer.add(this.xline);
       shapesLayer.add(this.yline);
+*/
+      shapesLayer.add(this.group);
 
       stage.add(this.msgLayer);
       stage.add(this.nameLayer);

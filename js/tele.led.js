@@ -10,7 +10,10 @@
      this.name = "led_" + _index;
      this.on = false;
 
-     this.opacity = .1;
+     this.msgLayer = new Kinetic.Layer();
+
+     //writeMessage(this.msgLayer, "1", this.x+5, this.y+5);
+
      this.frame = new Kinetic.Rect({
        y: this.y,
        x: this.x,
@@ -20,6 +23,7 @@
        strokeWidth: 1
     });
 
+	/*
     this.led = new Kinetic.Rect({
        y: this.y + this.border,
        x: this.x + this.border,
@@ -28,13 +32,14 @@
        fill: 'yellow',
        opacity: this.opacity
     });
+	*/
 
     this.setLed = function(_val)
     {
        if (_val) {
-         this.led.setOpacity(1);
+         //this.led.setOpacity(1);
        } else {
-         this.led.setOpacity(OPACITY);
+         //this.led.setOpacity(OPACITY);
        }
        shapesLayer.draw()
     }
@@ -43,7 +48,9 @@
     this.init = function()
     {
       shapesLayer.add(this.frame);
-      shapesLayer.add(this.led);
+
+      stage.add(this.msgLayer);
+      //shapesLayer.add(this.led);
 
       sb.addSubscribe(this.name, "boolean");
     };

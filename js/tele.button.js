@@ -14,6 +14,10 @@
 
      this.nameLayer = new Kinetic.Layer();
 
+     this.group = new Kinetic.Group({
+       draggable: true
+     });
+
      this.frame = new Kinetic.Rect({
        y: this.y,
        x: this.x,
@@ -33,6 +37,9 @@
        strokeWidth: 2,
        opacity: OPACITY
     });
+
+    this.group.add(this.frame);
+    this.group.add(this.circle);
 
     this.circle.on('mousedown', function() {
 
@@ -55,14 +62,23 @@
         shapesLayer.draw();
     });
 
+    this.group.on('dragend', function() {
+      
+      p = _this.group.getPosition();
+      console.log("write frame : " + p.x + "," + p.y);
+      writeMessage(_this.nameLayer, _this.name, _this.x + p.x, _this.y + p.y + _this.size + 20);
+    });
+
     //Init and add to SpaceBrew
     this.init = function()
     {
-      shapesLayer.add(this.frame);
-      shapesLayer.add(this.circle);
+      //shapesLayer.add(this.frame);
+      //shapesLayer.add(this.circle);
+      shapesLayer.add(this.group);
 
       stage.add(this.nameLayer);
-      writeMessage(this.nameLayer, this.name, this.x, this.y+this.size+20);
+      console.log("Init frame : " + _this.frame.getX() + "," + (1*_this.frame.getY()+_this.size+20));
+      writeMessage(this.nameLayer, this.name, this.x, (1*this.y+this.size+20));
 
       sb.addPublish(this.name, "boolean");
     };

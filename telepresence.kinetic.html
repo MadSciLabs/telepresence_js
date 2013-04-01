@@ -14,7 +14,7 @@
         <script type="text/javascript" src="js/tele.joystick.js"></script>
         <script type="text/javascript" src="js/tele.led.js"></script>
     
-        <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.3.0-beta2.js"></script>
+        <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.4.0.min.js"></script>
 
     <script type="text/javascript">
 
@@ -76,6 +76,45 @@
 			sb.connect();
 		};
 
+      function addButton()
+      {
+        var unit_size = 150;
+        var _button = new obj_button(10,10,unit_size,buttonIndex);
+        _button.init();
+
+        shapesLayer.draw();
+        buttonIndex++;
+      }
+
+      function addJoystick()
+      {
+        var unit_size = 300;
+        var _joy = new obj_joystick(10,10,unit_size,joyIndex);
+        _joy.init();
+
+        shapesLayer.draw();
+        joyIndex++;
+      }
+
+      function addSlider()
+      {
+        var unit_size = 300;
+        var _slider = new obj_slider(10,10,unit_size,sliderIndex);
+        _slider.init();
+
+        shapesLayer.draw();
+        sliderIndex++;
+      }
+
+      function addLed()
+      {
+        var unit_size = 75;
+        var _led = new obj_led(10,10,unit_size,ledIndex);
+        _led.init();
+
+        shapesLayer.draw();
+        sliderIndex++;
+      }
     </script>
 
     <style>
@@ -83,15 +122,31 @@
         margin: 0px;
         padding: 0px;
       }
+
+      #container {
+        position: relative;
+      }
+
+      #links {
+        position: absolute;       
+      }
+ 
     </style>
   </head>
   <body>
-    <div id="container"></div>
+    <div id="container">
+      <div id="links">
+      <a href="javascript:addButton()">Add Button</a><br>
+      <a href="javascript:addJoystick()">Add Joystick</a><br>
+      <a href="javascript:addSlider()">Add Slider</a><br>
+      <a href="javascript:addLed()">Add Led</a><br>
+      </div>
+    </div>
+
     <script>
 
       //SpaceBrew
       var sb;
-      var unit_size = 150;
 
       setupSpacebrew();
 
@@ -105,26 +160,30 @@
 
       var stage = new Kinetic.Stage({
         container: 'container',
-        width: 800,
-        height: 600
+        width: 1000,
+        height: 800
       });
 
       var shapesLayer = new Kinetic.Layer();
 
-      var joy_1 = new obj_joystick(50,50,300,0);
-      var button_0 = new obj_button(375,50,150,0);
-      var button_1 = new obj_button(525,200,150,1);
-      var slider_0 = new obj_slider(700,50,300,0);
-      var led_0 = new obj_led(50,375,75,0);
+      var buttonIndex = 0;
+      var joyIndex = 0;
+      var sliderIndex = 0;
+      var ledIndex = 0;
 
-      joy_1.init();
-      button_0.init();
-      button_1.init();
-      slider_0.init();
-      led_0.init();
+      //var joy_1 = new obj_joystick(50,50,300,0);
+      //var button_0 = new obj_button(375,50,150,0);
+      //var button_1 = new obj_button(525,200,150,1);
+      //var slider_0 = new obj_slider(700,50,300,0);
+      //var led_0 = new obj_led(50,375,75,0);
+
+      //joy_1.init();
+      //button_0.init();
+      //button_1.init();
+      //slider_0.init();
+      //led_0.init();
 
       stage.add(shapesLayer);
-
     </script>
   </body>
 </html>
