@@ -67,6 +67,17 @@
 
          var scale = _radius / Math.sqrt(Math.pow(pos.x - _x, 2) + Math.pow(pos.y - _y, 2));
 
+         //Write to SB
+         p = _this.inside.getPosition();
+         var x = range(p.x,_this.range_x1,_this.range_x2,0,1023);
+         //var x = range(p.x+groupP.x,_this.range_x1,_this.range_x2,0,1023);
+         var y = range(p.y,_this.range_y1,_this.range_y2,0,1023);
+
+         writeMessage(_this.msgLayer, x + ", " + y, _this.x+5+groupP.x, _this.y+20+groupP.y);
+
+         sb.send(_this.name_x, "range", x);
+         sb.send(_this.name_y, "range", y);
+
          if(scale < 1)
            return {
              y: Math.round((pos.y - _y) * scale + _y),
@@ -106,7 +117,6 @@
 
     this.circle.on('mousemove', function() {
 
-console.log('mousemove');
         if (_this.on) {
 console.log('mousemove on');
 
@@ -158,13 +168,7 @@ console.log(">");
     //Init and add to SpaceBrew
     this.init = function()
     {
-/*
-      shapesLayer.add(this.frame);
-      shapesLayer.add(this.circle);
-      shapesLayer.add(this.inside);
-      shapesLayer.add(this.xline);
-      shapesLayer.add(this.yline);
-*/
+
       shapesLayer.add(this.group);
 
       stage.add(this.msgLayer);

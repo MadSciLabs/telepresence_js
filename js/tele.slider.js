@@ -40,13 +40,19 @@
         dragBoundFunc: function(pos) {
 
           groupP = _this.group.getPosition();
-          console.log(groupP.x + "," + groupP.y);
 
-          var y = pos.y > _size ? _size : pos.y;
-          y = y < 0 ? 0 : y;
+          var y = pos.y > _size+groupP.y ? _size+groupP.y : pos.y;
+          y = y < groupP.y ? groupP.y : y;
+
+          //Spacebrew to
+          var p = _this.xline.getPosition();
+          var _ty = range(p.y,0,_this.size,1023,0);
+          writeMessage(_this.msgLayer, _ty, _this.x+5+groupP.x, _this.y+20+groupP.y);
+          sb.send(_this.name, "range", _ty);
 
           return {
-            y: y + groupP.y,
+            y: y,
+            //y: y + groupP.y,
             x: groupP.x
           };
         }
@@ -64,20 +70,7 @@
      this.group.on('dragend', function() {
   
        p = _this.group.getPosition();
-       console.log("write frame : " + p.x + "," + p.y);
        writeMessage(_this.nameLayer, _this.name, _this.x + p.x, _this.y + p.y + _this.size + 20);
-     });
-
-     this.frame.on('mousemove', function() {
-
-        if (_this.on) {
-
-        var p = _this.xline.getPosition();
-        var _ty = range(p.y,0,_this.size,1023,0);
-
-        writeMessage(_this.msgLayer, _ty, _this.x+5, _this.y+20);
-        sb.send(this.name, "range", _ty);
-        }
      });
 
     this.xline.on('dragstart', function() {
@@ -101,16 +94,14 @@
      //Init and add to SpaceBrew
      this.init = function()
      {
-       //shapesLayer.add(this.frame);
-       //shapesLayer.add(this.xline);
        shapesLayer.add(this.group);
 
-       stage.add(_this.msgLayer);
+       stage.add(this.msgLayer);
        stage.add(this.nameLayer);
 
-       writeMessage(this.nameLayer, this.name, this.x, _this.y+this.size+20);
+       writeMessage(this.nameLayer, this.name, this.x, this.y+this.size+20);
 
-       sb.addPublish(this.name, "boolean");
+       sb.addPublish(this.name, "range");
      };
 }
 
