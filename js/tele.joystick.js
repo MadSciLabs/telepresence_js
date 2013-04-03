@@ -35,9 +35,9 @@
        height: this.size,
        stroke: 'black',
        strokeWidth: 2
-    });
+     });
 
-    this.circle = new Kinetic.Circle({
+     this.circle = new Kinetic.Circle({
        y: this.y+this.radius,
        x: this.x+this.radius,
        radius: this.radius,
@@ -45,7 +45,7 @@
        stroke: 'black',
        strokeWidth: 1,
        opacity: OPACITY
-    });
+     });
 
     this.inside = new Kinetic.Circle({
        draggable: true,
@@ -60,7 +60,6 @@
        dragBoundFunc: function(pos) {
 
          groupP = _this.group.getPosition();
-         console.log(groupP.x + "," + groupP.y);
 
          _radius = _this.radius - _this.small_radius;
          _x = _this.x + _radius + _this.small_radius + groupP.x;
@@ -107,7 +106,9 @@
 
     this.circle.on('mousemove', function() {
 
+console.log('mousemove');
         if (_this.on) {
+console.log('mousemove on');
 
           p = _this.inside.getPosition();
 
@@ -123,10 +124,13 @@
     });
 
     this.inside.on('dragstart', function() {
+console.log('dragstart');
+
       _this.on = true;
     });
 
     this.inside.on('dragend', function() {
+console.log('drag end');
       _this.on = false;
     });
 
@@ -140,11 +144,14 @@
       shapesLayer.draw();
     });
 
+    this.inside.on('mousemove', function() {
+console.log(">");
+    });
+
     this.group.on('dragend', function() {
       var mousePos = stage.getMousePosition();
 
       p = _this.group.getPosition();
-      //console.log("write frame : " + p.x + "," + p.y);
       writeMessage(_this.nameLayer, _this.name_x+", "+_this.name_y, _this.x + p.x, _this.y + p.y + _this.size + 20);
     });
 
