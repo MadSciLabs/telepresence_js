@@ -1,14 +1,20 @@
   var BORDER_SIZE = 2;
   var OPACITY = .5;
 
-  function obj_slider(_x, _y, _size, _index)
+  function obj_slider(_x, _y, _size, _index, _range_l, _range_h)
   {
      this.vertical = true;
      this.name = "slider_" + _index;
      this.size = _size;
      this.x = _x;
      this.y = _y;
+     this.range_l = _range_l;
+     this.range_h = _range_h;
+
      this.on = false;
+
+     this.range_low;
+     this.range_high;
 
      this.msgLayer = new Kinetic.Layer();
      this.nameLayer = new Kinetic.Layer();

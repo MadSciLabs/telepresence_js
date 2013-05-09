@@ -1,12 +1,14 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
-	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/jquery.mobile-1.2.0.min.css" />
+	<script src="js/jquery-1.8.2.min.js"></script>
 <!--
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 	//This needs to be commentd out for some reason
 	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+        <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.4.0.min.js"></script>
 -->
         <script type="text/javascript" src="js/sb.js"></script>
         <script type="text/javascript" src="js/tele.button.js"></script>
@@ -14,7 +16,7 @@
         <script type="text/javascript" src="js/tele.joystick.js"></script>
         <script type="text/javascript" src="js/tele.led.js"></script>
     
-        <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.4.0.min.js"></script>
+        <script src="js/kinetic-v4.4.0.min.js"></script>
 
     <script type="text/javascript">
 
@@ -103,6 +105,13 @@
         _slider.init();
 
         shapesLayer.draw();
+
+        //Add input field
+        var newDiv = $(document.createElement('div')).attr('id', 'range_slider_' + sliderIndex);
+        newDiv.html('slider_' + sliderIndex + '<br><input type="text" id="range_slider_l_' + sliderIndex + '" /> to <input type="text" id="range_slider_h_' + sliderIndex + '" />');
+
+        newDiv.appendTo("#rangeInputs");
+
         sliderIndex++;
       }
 
@@ -161,6 +170,8 @@
       body {
         margin: 0px;
         padding: 0px;
+        font-family: Arial, Sans-Serif;
+        font-size: 12px;
       }
 
       #links {
@@ -170,6 +181,21 @@
         height: 20px;
         background:#dcdcdc;
         border: 1px;
+      }
+
+      #rangeInputs {
+        padding: 5px;
+        position: relative;
+	width:100%;
+        background:#cdcdcd;
+        height: 35px;
+      }
+
+      #rangeInputs input[type="text"]
+      {
+        font-family: Arial, Sans-Serif;
+        width:35px;
+        font-size: 12px;
       }
 
     </style>
@@ -184,7 +210,9 @@
       <a href="javascript:addSlider()">Add Slider</a> |
       <a href="javascript:addLed()">Add Led</a>
       </div>
-      
+
+      <div id="rangeInputs"></div>
+
       <div id="webcam" style="position:absolute;top:85px;left:10px;"><noscript><img src="http://10.70.3.187:8080/?action=snapshot" /></noscript></div>
     </div>
 
@@ -229,8 +257,8 @@
       });
       
       shapesLayer.add(r);
-
       stage.add(shapesLayer);
+
     </script>
   </body>
 </html>

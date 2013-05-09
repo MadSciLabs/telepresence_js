@@ -122,8 +122,8 @@ console.log('mousemove on');
 
           p = _this.inside.getPosition();
 
-          var x = range(p.x+groupP.x,_this.range_x1,_this.range_x2,0,1023);
-          var y = range(p.y+groupP.y,_this.range_y1,_this.range_y2,0,1023);
+          var x = p.x + groupP.x; //range(p.x+groupP.x,_this.range_x1,_this.range_x2,0,1023);
+          var y = p.y + groupP.y; //range(p.y+groupP.y,_this.range_y1,_this.range_y2,0,1023);
 
           writeMessage(_this.msgLayer, x + ", " + y, _this.x+5, _this.y+20);
 
