@@ -101,7 +101,7 @@
       function addSlider()
       {
         var unit_size = 300;
-        var _slider = new obj_slider(350,10,unit_size,sliderIndex);
+        var _slider = new obj_slider(350,10,unit_size,sliderIndex,0,1023);
         _slider.init();
 
         shapesLayer.draw();
@@ -109,6 +109,10 @@
         //Add input field
         var newDiv = $(document.createElement('div')).attr('id', 'range_slider_' + sliderIndex);
         newDiv.html('slider_' + sliderIndex + '<br><input type="text" id="range_slider_l_' + sliderIndex + '" /> to <input type="text" id="range_slider_h_' + sliderIndex + '" />');
+
+	//Set input field
+	$('rang_slider_l_'+sliderIndex).val(_slider.range_l);
+	$('rang_slider_h_'+sliderIndex).val(_slider.range_h);
 
         newDiv.appendTo("#rangeInputs");
 
