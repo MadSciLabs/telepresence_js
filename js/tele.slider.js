@@ -54,7 +54,9 @@
           var p = _this.xline.getPosition();
           var _ty = range(p.y,0,_this.size,1023,0);
           writeMessage(_this.msgLayer, _ty, _this.x+5+groupP.x, _this.y+20+groupP.y);
-          sb.send(_this.name, "range", _ty);
+
+	  console.log("write range : " + _ty);
+          sb.send(_this.name, "range", String(_ty));
 
           return {
             y: y,
@@ -107,7 +109,7 @@
 
        writeMessage(this.nameLayer, this.name, this.x, this.y+this.size+20);
 
-       sb.addPublish(this.name, "range");
+       sb.addPublish(this.name, "range", "1023");
      };
 }
 

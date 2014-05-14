@@ -1,1 +1,1 @@
-../../spacebrew-javascript-examples/library/sb.js
+../../spacebrew.js/library/sb-1.4.0.js

@@ -28,6 +28,28 @@
      this.msgLayer = new Kinetic.Layer();
      this.nameLayer = new Kinetic.Layer();
 
+     this.setX = function(_val)
+     {
+       console.log("X " + _val);
+
+       _val = range(_val,0,1023,_this.range_x1,_this.range_x2);
+       p = _this.inside.getPosition();
+
+       _this.inside.setPosition(_val,p.y);
+       shapesLayer.draw();
+     }
+
+     this.setY = function(_val)
+     {
+       console.log("Y " + _val);
+
+       _val = range(_val,1023,0,_this.range_y1,_this.range_y2);
+       p = _this.inside.getPosition();
+
+       _this.inside.setPosition(p.x,_val);
+       shapesLayer.draw();
+     }
+
      this.frame = new Kinetic.Rect({
        y: this.y,
        x: this.x,
@@ -75,8 +97,8 @@
 
          writeMessage(_this.msgLayer, x + ", " + y, _this.x+5+groupP.x, _this.y+20+groupP.y);
 
-         sb.send(_this.name_x, "range", x);
-         sb.send(_this.name_y, "range", y);
+         sb.send(_this.name_x, "range", String(x));
+         sb.send(_this.name_y, "range", String(y));
 
          if(scale < 1)
            return {
@@ -155,7 +177,6 @@ console.log('drag end');
     });
 
     this.inside.on('mousemove', function() {
-console.log(">");
     });
 
     this.group.on('dragend', function() {
@@ -178,6 +199,9 @@ console.log(">");
 
       sb.addPublish(this.name_x, "range");
       sb.addPublish(this.name_y, "range");
+
+      sb.addSubscribe(this.name_x, "range");
+      sb.addSubscribe(this.name_y, "range");
     };
 }
 
